@@ -6,12 +6,12 @@ console.log("Data Promise: ", dataPromise);
 let bbData;
 
 // Fetch the JSON data and console log it
-dataPromise.then(function(data) {
+function init(){
+  dataPromise.then(function(data) {
   bbData = data;
-  console.log(bbData);
+  console.log("bbData", bbData);
   // Get names 
   let names = bbData.names;
-  console.log('names: ', names);
 
     //create a graph of one sample.  Initializes bar graph to show the first sample: 
     var sampleRow = bbData.samples[0];
@@ -46,60 +46,72 @@ dataPromise.then(function(data) {
   };
   
   Plotly.newPlot("bubble", data, layout);
+
+  
+  //TODO: display a static table for the first sample's metadata 
+  // (edit from the sample code in the plotly documentationhttps://plotly.com/javascript/table/ )
+  // metadataRow = [bbData.metadata[0].id, bbData.metadata[0].ethnicity,
+                    // bbData.metadata[0].gender, bbData.metadata[0].age, bbData.metadata[0].location]
+  // var data = [{
+  //   type: 'table',
+  //   cells: {
+  //     values: metadataRow.values,
+  //     align: "center",
+  //     line: {color: "black", width: 1},
+  //     font: {family: "Arial", size: 11, color: ["black"]}
+  //   }
+  // }]
+  
+  // Plotly.newPlot('sample-metadata', data);
   // Select dropdown
   let dropdown = d3.select("#selDataset");
 
-  //TODO: display a static table for the first sample
-
-  // Define the optionChanged function which will update the plot based on the dropdown menu selection
-  function optionChanged(passedValue) {
-  // Call the updatePlotly function with the passed value
-  updatePlotly(passedValue);
-  }
   // Populate options
   names.forEach(name => {
     dropdown.append("option")
     .text(name)
     .attr("value", name);
   });
-  // Add change handler
-dropdown.on("change", function() {
-  updatePlotly();
+
 });
+}
 
-// Update the updatePlotly function to remove the dropdown parameter
-function updatePlotly() {
-
+function optionChanged(sample) {
+  d3.json(url).then(function(bbData) {
   // Get selected name directly from the dropdown
   const selectedName = d3.select("#selDataset").property("value");
 
-  // Find sample data
-  const sampleData = bbData.samples.find(s => s.id === selectedName);
-
-    // Update graph data
+  // get samples key
+  let samples = bbData.samples
+  // filter function to get data from the sample row
+  let sampleData = bbData.samples.filter(s => s.id === sample);
+  console.log("sampleData: ", sampleData);
+  //use sampleData[0] to draw plots
+  let sampleRow = sampleData[0];
+  console.log("sampleRow: ", sampleRow);
+      // Update graph data
     let graphData = [{
       type: "bar",
       orientation: "h",
-      x: sampleData.sample_values.slice(0, 10).reverse(),
-      y: sampleData.otu_ids.slice(0, 10).map(id => `OTU ${id}`).reverse(),
-      text: sampleData.otu_labels
+      x: sampleRow.sample_values.slice(0, 10).reverse(),
+      y: sampleRow.otu_ids.slice(0, 10).map(id => `OTU ${id}`).reverse(),
+      text: sampleRow.otu_labels
   }];
-
-  // Update the chart with the new data
+    // Update the chart with the new data
   // TODO: Adjust colors on chart to a broader range 
   //and change opacity to more dense
   Plotly.newPlot('bar', graphData);
 
-  // Update the bubble chart data
+    // Update the bubble chart data
   var tracebub = {
-    x: sampleData.otu_ids.reverse(),
-    y: sampleData.sample_values.reverse(),
+    x: sampleRow.otu_ids.reverse(),
+    y: sampleRow.sample_values.reverse(),
     mode: 'markers',
     marker: {
-      color: sampleData.otu_ids.reverse(),
-      size: sampleData.sample_values.reverse()
+      color: sampleRow.otu_ids.reverse(),
+      size: sampleRow.sample_values.reverse()
     },
-    text: sampleData.otu_labels
+    text: sampleRow.otu_labels
   };
   var layout = {
     title: 'All OTUs on this Sample',
@@ -109,9 +121,10 @@ function updatePlotly() {
   var data = [tracebub];
   // Update the bubble chart
   Plotly.newPlot("bubble", data, layout);
+
+})
 }
 
-  // TODO: update the metadata table 
-  // according to sample chosen on the dropdown menu
-});
+init();
+
 
