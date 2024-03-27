@@ -20,7 +20,7 @@ function init(){
     orientation: "h",
     x: sampleRow.sample_values.slice(0,10).reverse(),
     y: sampleRow.otu_ids.slice(0,10).map(id => `OTU ${id}`).reverse(),
-    text: sampleRow.otu_labels
+    text: sampleRow.otu_labels.slice(0,10).reverse()
     }
     let graphData = [trace]
     Plotly.newPlot('bar', graphData);
@@ -94,7 +94,7 @@ function optionChanged(sample) {
       orientation: "h",
       x: sampleRow.sample_values.slice(0, 10).reverse(),
       y: sampleRow.otu_ids.slice(0, 10).map(id => `OTU ${id}`).reverse(),
-      text: sampleRow.otu_labels
+      text: sampleRow.otu_labels.slice(0,10).reverse()
   }];
   // Update the chart with the new data
   // TODO: Adjust colors on chart to a broader range 
