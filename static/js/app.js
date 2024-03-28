@@ -54,7 +54,7 @@ function init(){
   Plotly.newPlot("bubble", data, blayout);
 
   
-  //TODO: display a static table for the first sample's metadata 
+  //display a static table for the first sample's metadata 
   // (edit from the sample code in the plotly documentationhttps://plotly.com/javascript/table/ )
 // Extract metadata for the first sample
 let metadata = bbData.metadata[0];
@@ -65,6 +65,27 @@ let tableCells = [[Object.keys(metadata)], [Object.values(metadata)]];
 console.log("tableCells: ", tableCells);
 
 document.getElementById("sample-metadata").innerHTML = `id: ${metadata.id} <br> ethnicity: ${metadata.ethnicity} <br> gender: ${metadata.gender} <br> age: ${metadata.age} <br> location: ${metadata.location} <br> bbtype: ${metadata.bbtype} <br> wfreq: ${metadata.wfreq}`;
+
+// Display a gauge of the wash frequency of the initial sample
+var data = [
+	{
+		domain: { x: [0, 1], y: [0, 1] },
+		value: metadata.wfreq,
+		title: { text: "Belly Button Wash Frequency" },
+		type: "indicator",
+		mode: "gauge+number",
+    gauge: {
+      axis: { range: [null, 10] },
+      steps: [
+        { range: [0, 10], color: "lightgrey" },
+
+      ],
+    }
+  }
+	
+];
+var layout = { width: 600, height: 500, margin: { t: 0, b: 0 } };
+Plotly.newPlot('gauge', data, layout);
 
   // Select dropdown
 let dropdown = d3.select("#selDataset");
@@ -120,7 +141,7 @@ function optionChanged(sample) {
   var data = [tracebub];
   // Update the bubble chart
   Plotly.newPlot("bubble", data, layout);
-//  TODO: update the metadata info
+//  update the metadata info
   let metadata = bbData.metadata.filter(s => s.id.toString() === sample);
 
   console.log("metadata after change: ", metadata);
@@ -131,6 +152,27 @@ function optionChanged(sample) {
   <br> location: ${metadata[0].location} 
   <br> bbtype: ${metadata[0].bbtype} 
   <br> wfreq: ${metadata[0].wfreq}`;
+
+// update the wash frequency gauge
+var data = [
+	{
+		domain: { x: [0, 1], y: [0, 1] },
+		value: metadata[0].wfreq,
+		title: { text: "Belly Button Wash Frequency" },
+		type: "indicator",
+		mode: "gauge+number",
+    gauge: {
+      axis: { range: [null, 10] },
+      steps: [
+        { range: [0, 10], color: "lightgrey" },
+
+      ],
+    }
+  }
+	
+];
+var layout = { width: 600, height: 500, margin: { t: 0, b: 0 } };
+Plotly.newPlot('gauge', data, layout);
 })
 }
 
